@@ -1,8 +1,8 @@
 {{- if .Values.configMap.enabled }}
 apiVersion: v1 
-kind: configMap
+kind: ConfigMap
 metadata:
-  name: {{ include "employeeapp.name" . }}
+  name: {{ .Values.configMap.name }}
   namespace: {{ include "employeeapp.namespace" . }}
 data:
 {{- range $key, $value := .Values.configMap.data }}
