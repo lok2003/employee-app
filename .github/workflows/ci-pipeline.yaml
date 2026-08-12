@@ -1,0 +1,30 @@
+name: ci-pipeline
+on:
+  push:
+    branches:
+      - main 
+jobs:
+  build:
+    runs-on: ubuntu-latest 
+    
+    steps:
+      
+      - name: checkout source code 
+        uses: actions/checkout@v4 
+
+      - name: setup-java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven 
+
+      - name: Build package 
+        run: mvn clean package 
+
+      - name: upload jar files 
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-artifacts
+          path: target/*.jar
+  
