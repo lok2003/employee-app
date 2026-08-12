@@ -1,0 +1,50 @@
+apiVersion: apps/v1 
+kind: Deployment 
+metadata:
+  name: {{ include "employeeapp.fullname" . }}
+  namespace: {{ include "employeeapp.namespace" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "employeeapp.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "employeeapp.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ include "employeeapp.name" . }}
+          {{- with .Values.image }}
+          image: "{{ .repository }}:{{ .tag }}"
+          imagePullPolicy: {{ .pullPolicy }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+          envFrom:
+            {{- if .Values.configMap.enabled }}
+            - configMapRef:
+                name: {{ .Values.configMap.name }}
+            {{- end }}
+            {{- if .Values.secret.enabled }}
+            - secretRef:
+                name: {{ .Values.secret.name }}
+            {{- end }}
+          livenessProbe:
+            {{- toYaml .Values.liveness | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readiness | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- if .Values.storage.enabled }}
+          volumeMounts:
+            - name: {{ .Values.storage.volumes.name }}
+              mountPath: {{ .Values.storage.volumes.mountPath }}
+          {{- end }}
+      {{- if .Values.storage.enabled }}
+      volumes:
+        - name: {{ .Values.storage.volumes.name }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.storage.pvc.name }}
+      {{- end }}

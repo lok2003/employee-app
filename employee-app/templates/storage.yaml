@@ -1,0 +1,11 @@
+{{- if .Values.storage.enabled }}
+apiVersion: v1 
+kind: StorageClass 
+metadata:
+  name: {{ .Values.storage.storageClass.name }}
+provisioner: {{ .Values.storage.storageClass.provisioner }}
+parameters:
+  type: {{ .Values.storage.storageClass.parameters.type }}
+reclaimPolicy: {{ .Values.storage.storageClass.reclaimPolicy }}
+volumeBendingMode: {{ .Values.storage.storageClass.volumeBendingMode }}
+{{- end }}

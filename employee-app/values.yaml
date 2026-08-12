@@ -1,0 +1,74 @@
+namespace:
+  name: employee 
+replicaCount: 2 
+
+image: 
+  repository: 713861277744.dkr.ecr.ap-south-1.amazonaws.com/employee-app
+  tag: "v1.0.0"
+  pullPolicy: IfNotPresent 
+
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi 
+  limits: 
+    cpu: 500m
+    memory: 512Mi 
+readiness:
+  httpGet:
+    path: /
+    port: 8080 
+  initialDelaySeconds: 60
+  periodSeconds: 50
+liveness:
+  httpGet:
+    path: /
+    port: 8080 
+  initialDelaySeconds: 70
+  periodSeconds: 60
+
+
+configMap:
+  enabled: true 
+  name: employee-config 
+  data:
+    APP_NAME: employee-app  
+    APP_ENV: production 
+
+secret:
+  enabled: true
+  name: employee-secret 
+  data:
+    DB_USERNAME: admin 
+    DB_PASSWORD: password123 
+ingress:
+  enabled: true 
+  className: nginx
+  host: employee.employee.com 
+  path: /
+  pathType: Prefix 
+
+storage:
+  enabled: true 
+  storageClass:
+    name: employee-gp3 
+    provisioner: ebs.csi.aws.com 
+    parameters:
+      type: gp3 
+    reclaimPolicy: Retain 
+    volumeBendingMode: WaitForFirstConsumer 
+  pvc: 
+    name: employee-pvc 
+    accessModes: 
+      - ReadWriteOnce 
+    storage: 5Gi
+  volumes:
+    name: employee-storage 
+    mountPath: /app/data 
+
+
+service:
+  type: LoadBalancer 
+  port: 8080
+  targetPort: 8080 
