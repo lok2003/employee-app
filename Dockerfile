@@ -12,4 +12,4 @@ USER employee
 
 EXPOSE 8080 
 
-CMD ["java" "-jar" "/app/app.jar"] 
+CMD ["java", "-jar", "/app/app.jar"] 
